@@ -30,7 +30,8 @@ CREATE TABLE employees (
 );
 
 INSERT INTO department (dept_name) VALUES ('Management'), ('Front of House'), ('Back of House');
-INSERT INTO company_role (title, salary, dept_id) VALUES
+INSERT INTO company_role (title, salary, dept_id) 
+VALUES
 ('General Manager', 100000.00, 1), 
 ('Executive Chef', 85000.00, 1),
 ('Sous Chef', 60000.00, 3),
@@ -40,12 +41,13 @@ INSERT INTO company_role (title, salary, dept_id) VALUES
 ('Host', 40000.00, 2),
 ('Server', 35000.00, 2);
 
-INSERT INTO employees (first_name, last_name, emp_role_id, manager_id) VALUES
-('Sean', 'Hugme', 1, 1),
-('Septie', 'May', 2, 2),
-('Holli', 'Carter', 3, null),
-('Sue', 'Smith', 4, null),
-('Harry', 'Stiles', 5, null),
-('Maury', 'Mann', 6, 3),
-('Bev', 'Cooke', 7, null),
-('Alicia', 'Dunnmore', 8, null);
+INSERT INTO employees (first_name, last_name, emp_role_id, manager_id) 
+VALUES
+('Sean', 'Hugme', 1, null),
+('Septie', 'May', 2, null),
+('Holli', 'Carter', 3, 2),
+('Sue', 'Smith', 4, 2),
+('Harry', 'Stiles', 5, 2,
+('Maury', 'Mann', 6, 1),
+('Bev', 'Cooke', 7, 1),
+('Alicia', 'Dunnmore', 8, 1);
