@@ -12,8 +12,7 @@ const connection = mysql.createConnection({
 
 });
 
-
-
+//function that prompts the user to answer questions
 const init = () => {
     inquirer
         .prompt({
@@ -28,8 +27,6 @@ const init = () => {
                 "Add Departments",
                 "Add Roles",
                 "Update Employee Role",
-                "Find Employee",
-                "Find Roles",
                 "exit"
             ]
         })
@@ -63,7 +60,7 @@ const init = () => {
         });
 };
 
-
+//Function to view all employees
 const viewAllEmployees = () => {
     connection.query(
         `SELECT employee.emp_id, employee.first_name, employee.last_name, title, salary, dept_name, 
@@ -81,7 +78,7 @@ const viewAllEmployees = () => {
         }
     )
 };
-
+//function to view all roles in the company
 const viewAllRoles = () => {
     connection.query(
         `SELECT company_role.role_id, company_role.title, company_role.salary, department.dept_name AS department
@@ -96,7 +93,7 @@ const viewAllRoles = () => {
         }
     )
 };
-
+//fuction to view all departments within the company
 const viewAllDepartments = () => {
     connection.query(
         `SELECT * FROM department`,
@@ -108,6 +105,8 @@ const viewAllDepartments = () => {
         }
     )
 };
+// adding new employees function
+
 const addEmployee = () => {
     let questions = [{
             type: "input",
@@ -121,15 +120,20 @@ const addEmployee = () => {
         },
         {
             type: "input",
-            message: "Employee's title?",
+            message: "Employee's title? (please use corresponding number only)",
             name: "titleID"
         },
         {
             type: "input",
-            message: "Who is the employee's manager?",
+            message: "Who is the employee's manager? (please use corresponding number only)",
             name: "managerID"
         }
     ];
+
+const updateEmpManager = (empID, roleID) =>{
+        connection.query("UPDATE employees SET emp_role_id = ? WHERE emp_id = ?", [roleID, empID])
+    };
+
     inquirer.prompt(questions).then((answer) => {
         connection.query(
             "INSERT INTO employees SET ?", {
@@ -140,12 +144,13 @@ const addEmployee = () => {
             },
             function (error) {
                 if (error) throw error;
+                updateEmpManager(answer.titleID, answer.managerID);
                 viewAllEmployees();
             }
         );
     });
 };
-
+//adding new departments
 const addDepartment = () => {
     inquirer
         .prompt({
@@ -164,7 +169,7 @@ const addDepartment = () => {
                 });
         });
 };
-
+//function to add role in the company
 const addRole = () => {
     let questions = [{
             type: "input",
@@ -189,15 +194,69 @@ const addRole = () => {
                 "dept_id": answer.department,
                 "salary": answer.salary
             },
-            function (error, res) {
+            (error, res) => {
                 if (error) throw error;
                 init();
             }
         );
     });
 };
+//function to give employee new role
+const updateEmployeeRole = () => {
+    connection.query(`SELECT * FROM company_db.employees`, 
+                        (err, res) => {
+                        if (err) throw err
+
+    inquirer.prompt([
+        {
+          name: 'employeeUpdated',
+          type: 'rawlist',
+          choices() {
+            const choiceArray = [];
+            results.forEach(({ first_name }) => {
+              choiceArray.push(first_name);
+            });
+            return choiceArray;
+          },
+          message: 'Name of employee you want to update',
+        },
+        {
+            name: 'newRole',
+            type: 'rawlist',
+            choices() {
+                const choiceArray = [];
+                results.forEach(({ role_id }) => {
+                  choiceArray.push(role_id);
+                });
+                return choiceArray;
+              },
+            message: "What is the new role? (please use corresponding number only)",
+        },
+
+      ])
+        .then((answer) => {
+            console.log(answer.employeeUpdated);
+            console.log(answer.newRole);
+                init();
+            });
+    
+    connection.query(
+                'UPDATE employees SET role_id = ? WHERE first_name = ?',
+                [answer.newRole, answer.employeeUpdated],
+                    (err) => {
+                    if (err) throw err;
+                    init();
+                }
+            )
+        })
+    }   
+
+
+
+//connection to mysql server and database
 
 connection.connect((err) => {
     if (err) throw err;
+//runs the init function after connection is made to prompt the user
     init();
 });
