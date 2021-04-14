@@ -202,7 +202,7 @@ const addRole = () => {
     });
 };
 //function to give employee new role
-const updateEmployeeRole = () => {
+/*const updateEmployeeRole = () => {
     connection.query(`SELECT * FROM company_db.employees`, 
                         (err, res) => {
                         if (err) throw err
@@ -249,7 +249,7 @@ const updateEmployeeRole = () => {
                 }
             )
         })
-    }   
+    }  */ 
 
 
 
