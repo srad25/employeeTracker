@@ -56,11 +56,6 @@ const init = () => {
                 case "Update Employee Roles":
                     updateEmployeeRole();
                     break;
-                case "Find Employee":
-                    findEmployee();
-                    break;
-                case "Find Roles":
-                    findRoles();
                 case "exit":
                     connection.end();
                     break;
@@ -113,7 +108,94 @@ const viewAllDepartments = () => {
         }
     )
 };
+const addEmployee = () => {
+    let questions = [{
+            type: "input",
+            message: "Employee's first name?",
+            name: "first_name"
+        },
+        {
+            type: "input",
+            message: "Employee's last name?",
+            name: "last_name"
+        },
+        {
+            type: "input",
+            message: "Employee's title?",
+            name: "titleID"
+        },
+        {
+            type: "input",
+            message: "Who is the employee's manager?",
+            name: "managerID"
+        }
+    ];
+    inquirer.prompt(questions).then((answer) => {
+        connection.query(
+            "INSERT INTO employees SET ?", {
+                first_name: answer.first_name,
+                last_name: answer.last_name,
+                emp_role_id: answer.titleID,
+                manager_id: answer.managerID,
+            },
+            function (error) {
+                if (error) throw error;
+                viewAllEmployees();
+            }
+        );
+    });
+};
 
+const addDepartment = () => {
+    inquirer
+        .prompt({
+            type: "input",
+            message: "What is the name of the new department?",
+            name: "department"
+        })
+        .then((answer) => {
+            console.log(answer.department);
+            connection.query("INSERT INTO department SET ?", {
+                    "dept_name": answer.department,
+                },
+                function (err, res) {
+                    if (err) throw err;
+                    init();
+                });
+        });
+};
+
+const addRole = () => {
+    let questions = [{
+            type: "input",
+            message: "What role would you like to add?",
+            name: "title"
+        },
+        {
+            type: "input",
+            message: "In what department?",
+            name: "department"
+        },
+        {
+            type: "input",
+            message: "What is the salary for this role?",
+            name: "salary"
+        }
+    ];
+    inquirer.prompt(questions).then((answer) => {
+        connection.query(
+            "INSERT INTO company_role SET ?", {
+                "title": answer.title,
+                "dept_id": answer.department,
+                "salary": answer.salary
+            },
+            function (error, res) {
+                if (error) throw error;
+                init();
+            }
+        );
+    });
+};
 
 connection.connect((err) => {
     if (err) throw err;
