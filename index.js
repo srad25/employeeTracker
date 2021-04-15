@@ -50,7 +50,7 @@ const init = () => {
                 case "Add Roles":
                     addRole();
                     break;
-                case "Update Employee Roles":
+                case "Update Employee Role":
                     updateEmployeeRole();
                     break;
                 case "exit":
@@ -106,8 +106,12 @@ const viewAllDepartments = () => {
     )
 };
 // adding new employees function
+const updateEmpManager = (empID, roleID) =>{
+    connection.query("UPDATE employees SET emp_role_id = ? WHERE emp_id = ?", [roleID, empID])
+};
 
 const addEmployee = () => {
+    console.log('add emp selected');
     let questions = [{
             type: "input",
             message: "Employee's first name?",
@@ -130,9 +134,6 @@ const addEmployee = () => {
         }
     ];
 
-const updateEmpManager = (empID, roleID) =>{
-        connection.query("UPDATE employees SET emp_role_id = ? WHERE emp_id = ?", [roleID, empID])
-    };
 
     inquirer.prompt(questions).then((answer) => {
         connection.query(
@@ -195,17 +196,22 @@ const addRole = () => {
                 "salary": answer.salary
             },
             (error, res) => {
-                if (error) throw error;
+               if (error) throw error;
                 init();
             }
         );
     });
 };
-//function to give employee new role
-/*const updateEmployeeRole = () => {
-    connection.query(`SELECT * FROM company_db.employees`, 
-                        (err, res) => {
-                        if (err) throw err
+//function to give an existing employee new role
+const updateEmployeeRole = () => {
+    //console.log('Update emp role selected');
+   connection.query(`SELECT * FROM company_db.employees`, 
+                        (err, results) => {
+                        if (err) throw err;
+                        //console.log("Update emp role");
+                        
+    
+                    
 
     inquirer.prompt([
         {
@@ -225,8 +231,9 @@ const addRole = () => {
             type: 'rawlist',
             choices() {
                 const choiceArray = [];
-                results.forEach(({ role_id }) => {
-                  choiceArray.push(role_id);
+                results.forEach(({ emp_role_id }) => {
+                    //console.log(emp_role_id);
+                  choiceArray.push(emp_role_id);
                 });
                 return choiceArray;
               },
@@ -235,26 +242,24 @@ const addRole = () => {
 
       ])
         .then((answer) => {
+            connection.query(
+                'UPDATE employees SET emp_role_id = ? WHERE first_name = ?',
+                [answer.newRole, answer.employeeUpdated],
+                    (err) => {
+                    if (err) throw err;
+                    console.log('Employee Updated');
+                    init();
+                }
+            )
             console.log(answer.employeeUpdated);
             console.log(answer.newRole);
                 init();
             });
     
-    connection.query(
-                'UPDATE employees SET role_id = ? WHERE first_name = ?',
-                [answer.newRole, answer.employeeUpdated],
-                    (err) => {
-                    if (err) throw err;
-                    init();
-                }
-            )
+    
         })
-    }  */ 
-
-
-
+    }  
 //connection to mysql server and database
-
 connection.connect((err) => {
     if (err) throw err;
 //runs the init function after connection is made to prompt the user
